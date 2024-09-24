@@ -36,3 +36,14 @@ pub fn serde_inline_default(_attr: TokenStream, input: TokenStream) -> TokenStre
         _ => panic!("can only be used on structs"),
     }
 }
+
+/// Functionally identical to [serde_inline_default], with the addition of the macro appending `.into()` to avoid repetitious `.to_string()` and similar conversions.
+#[proc_macro_attribute]
+pub fn serde_inline_into(_attr: TokenStream, input: TokenStream) -> TokenStream {
+    let item = parse_macro_input!(input as Item);
+
+    match item {
+        Item::Struct(s) => expand::expand_struct(s),
+        _ => panic!("can only be used on structs"),
+    }
+}

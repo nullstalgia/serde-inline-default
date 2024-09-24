@@ -7,11 +7,18 @@ pub(crate) fn expand_struct(mut item: ItemStruct) -> proc_macro::TokenStream {
 
     for (i, field) in item.fields.iter_mut().enumerate() {
         for (j, attr) in field.attrs.iter_mut().enumerate() {
-            if !attr.path().is_ident("serde_inline_default") {
+            let is_serde_inline_default = attr.path().is_ident("serde_inline_default");
+            let is_serde_inline_into = attr.path().is_ident("serde_inline_into");
+
+            if !is_serde_inline_default && !is_serde_inline_into {
                 continue;
             }
 
-            let default: TokenStream = attr.parse_args().unwrap();
+            let mut default: TokenStream = attr.parse_args().unwrap();
+
+            if is_serde_inline_into {
+                default = quote! { #default.into() };
+            }
 
             // we check here if a function with the exact same return value already exists. if so,
             // this function gets used.
