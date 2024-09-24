@@ -12,6 +12,8 @@ mod expand;
 /// Set this macro on a struct where you use [`Serialize`] or [`Deserialize`] and use `#[serde_inline_default(...)]` on the field you want to have a inline default value.
 /// Replace the `...` with the value you want and it will be set as default if serde needs it.
 ///
+/// `#[serde_inline_into(...)]` is functionally identical to `#[serde_inline_default(...)]`, with the addition of appending `.into()` to avoid repetitious `.to_string()` and similar conversions.
+///
 /// Note that you must set this macro _before_ `#[derive(Serialize)]` / `#[derive(Deserialize)]` as it wouldn't work properly if set after the derive.
 ///
 /// # Examples
@@ -29,17 +31,6 @@ mod expand;
 /// [`Deserialize`]: https://docs.rs/serde/*/serde/trait.Deserialize.html
 #[proc_macro_attribute]
 pub fn serde_inline_default(_attr: TokenStream, input: TokenStream) -> TokenStream {
-    let item = parse_macro_input!(input as Item);
-
-    match item {
-        Item::Struct(s) => expand::expand_struct(s),
-        _ => panic!("can only be used on structs"),
-    }
-}
-
-/// Functionally identical to [serde_inline_default], with the addition of the macro appending `.into()` to avoid repetitious `.to_string()` and similar conversions.
-#[proc_macro_attribute]
-pub fn serde_inline_into(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let item = parse_macro_input!(input as Item);
 
     match item {
